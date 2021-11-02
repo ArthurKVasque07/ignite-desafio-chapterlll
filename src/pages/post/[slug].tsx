@@ -22,9 +22,11 @@ import { getPrismicClient } from '../../services/prismic';
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
 import Header from '../../components/Header';
+import Comments from '../../components/Comments';
 
 interface Post {
   first_publication_date: string | null;
+  last_publication_date: string | null;
   data: {
     title: string;
     banner: {
@@ -87,6 +89,21 @@ export default function Post({
     }
   );
 
+  const isPostEdited =
+    post.first_publication_date != post.last_publication_date;
+
+  let editionDate;
+
+  if (isPostEdited) {
+    editionDate = format(
+      new Date(post.last_publication_date),
+      "'* editado em ' dd MM yyyy', ás' H':'m",
+      {
+        locale: ptBR,
+      }
+    );
+  }
+
   return (
     <>
       <Header />
@@ -109,6 +126,7 @@ export default function Post({
                 {`${readTime} min`}
               </li>
             </ul>
+            {isPostEdited && <span>{editionDate}</span>}
           </div>
 
           {post.data.content.map(content => {
@@ -146,6 +164,7 @@ export default function Post({
           )}
         </section>
 
+        <Comments />
         {preview && (
           <aside>
             <Link href="/api/exit-preview">
